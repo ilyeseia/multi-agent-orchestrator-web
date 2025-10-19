@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: orchestrator_db
+    environment:
+      POSTGRES_USER: orchestrator
+      POSTGRES_PASSWORD: secure_password_123
+      POSTGRES_DB: orchestrator_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U orchestrator"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: orchestrator_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Flask Web Application
+  web:
+    build: .
+    container_name: orchestrator_web
+    environment:
+      - DATABASE_URL=postgresql://orchestrator:secure_password_123@db:5432/orchestrator_db
+      - REDIS_URL=redis://redis:6379
+      - FLASK_ENV=production
+      - N8N_WEBHOOK_URL=https://n8n.tail7d68dd.ts.net/webhook/orchestrate-v2
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: gunicorn -w 4 -b 0.0.0.0:5000 app:app
+
+  # Celery Worker (for background tasks)
+  celery_worker:
+    build: .
+    container_name: orchestrator_celery_worker
+    environment:
+      - DATABASE_URL=postgresql://orchestrator:secure_password_123@db:5432/orchestrator_db
+      - REDIS_URL=redis://redis:6379
+      - N8N_WEBHOOK_URL=https://n8n.tail7d68dd.ts.net/webhook/orchestrate-v2
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+    command: celery -A celery_app.celery_tasks worker --loglevel=info
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: orchestrator_network

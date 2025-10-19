@@ -1,0 +1,45 @@
+/* ===============================
+   Styles personnalisés supplémentaires
+   =============================== */
+
+/* تخصيص ألوان الأزرار */
+.btn-primary {
+    @apply bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700;
+}
+
+.btn-success {
+    @apply bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700;
+}
+
+/* تخصيص Inputs */
+input, textarea {
+    @apply border border-gray-300 p-2 rounded w-full;
+}
+
+/* تخصيص البطاقات */
+.card {
+    @apply bg-white p-4 rounded shadow mb-4;
+}
+
+/* رسالة التنبيه */
+.flash-message-success {
+    @apply bg-green-200 text-green-800 p-3 rounded mb-4;
+}
+
+.flash-message-error {
+    @apply bg-red-200 text-red-800 p-3 rounded mb-4;
+}
+
+/* جدول المشاريع */
+.table {
+    @apply w-full border-collapse border border-gray-300;
+}
+
+.table th, .table td {
+    @apply border border-gray-300 p-2 text-left;
+}
+
+/* رسائل الخطأ */
+.error-text {
+    @apply text-red-600 text-sm mt-1;
+}

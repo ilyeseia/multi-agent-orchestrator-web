@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Project: {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 rounded shadow">
+    <h2 class="text-2xl font-bold mb-2">{{ project.name }}</h2>
+    <p class="mb-4">{{ project.description }}</p>
+
+    <h3 class="text-xl font-bold mb-2">Executions</h3>
+    <ul class="list-disc ml-5">
+        {% for exec in project.executions %}
+        <li>{{ exec.status }} - {{ exec.created_at.strftime('%Y-%m-%d %H:%M') }}</li>
+        {% else %}
+        <li>No executions yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

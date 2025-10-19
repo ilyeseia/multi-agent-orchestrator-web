@@ -1,12 +1,10 @@
-import time
-from models import db, Execution
+# utils/celery.py
+from celery import Celery
 
-def execute_workflow(project_id):
-    execution = Execution(project_id=project_id, status="running")
-    db.session.add(execution)
-    db.session.commit()
-    # Simulate some work
-    time.sleep(5)
-    execution.status = "completed"
-    db.session.commit()
-    return execution.id
+celery_app = Celery(
+    "orchestrator",
+    broker="redis://redis:6379/0",  # عدّل حسب إعداداتك
+    backend="redis://redis:6379/0"  # اختياري إذا تريد تتبع النتائج
+)
+
+celery_app.autodiscover_tasks(packages=["app.tasks"])  # عدّل المسار حسب مشروعك

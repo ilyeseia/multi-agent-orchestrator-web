@@ -1,12 +1,12 @@
-import subprocess
+import time
+from models import db, Execution
 
 def execute_workflow(project_id):
-    """
-    مثال لتشغيل Workflow خارجي للمشروع
-    """
-    try:
-        # هنا يمكن وضع الأمر الفعلي لتشغيل المشروع
-        result = subprocess.run(['echo', f'Running project {project_id}'], capture_output=True, text=True)
-        return result.stdout
-    except Exception as e:
-        return str(e)
+    execution = Execution(project_id=project_id, status="running")
+    db.session.add(execution)
+    db.session.commit()
+    # Simulate some work
+    time.sleep(5)
+    execution.status = "completed"
+    db.session.commit()
+    return execution.id
